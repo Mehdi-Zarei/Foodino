@@ -2,16 +2,15 @@ import mongoose from "mongoose";
 import { product, IBaseProduct } from "./BaseProduct";
 
 interface IFoodProduct extends IBaseProduct {
-  ingredients: string[];
+  weight: number;
   calories: number;
 }
 
 const schema = new mongoose.Schema<IFoodProduct>(
   {
-    ingredients: {
-      type: [String],
+    weight: {
+      type: Number,
       required: true,
-      trim: true,
     },
     calories: {
       type: Number,
