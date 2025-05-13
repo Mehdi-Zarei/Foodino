@@ -6,7 +6,8 @@ interface IBaseProduct {
   type: string;
   description: string;
   images: string[];
-  available: boolean;
+  isAvailable: boolean;
+  ingredients: string[];
 }
 
 const schema = new mongoose.Schema<IBaseProduct>(
@@ -30,17 +31,20 @@ const schema = new mongoose.Schema<IBaseProduct>(
       type: String,
       required: true,
       trim: true,
-      minlength: 20,
       maxlength: 500,
     },
     images: {
       type: [String],
-      required: true,
+      required: false, //TODO : Change to true
     },
-    available: {
+    isAvailable: {
       type: Boolean,
       required: true,
       default: false,
+    },
+    ingredients: {
+      type: [String],
+      required: true,
     },
   },
   { timestamps: true }
