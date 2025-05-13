@@ -14,7 +14,7 @@ const schema = new mongoose.Schema<IDrinkProduct>(
     },
     caffeineLevel: {
       type: Number,
-      required: true,
+      required: false,
     },
   },
   { timestamps: true }
