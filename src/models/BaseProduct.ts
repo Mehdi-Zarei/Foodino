@@ -35,7 +35,7 @@ const schema = new mongoose.Schema<IBaseProduct>(
     },
     images: {
       type: [String],
-      required: false, //TODO : Change to true
+      required: true,
     },
     isAvailable: {
       type: Boolean,
