@@ -110,6 +110,22 @@ export const update: RequestHandler = async (req, res, next) => {
 
 export const remove: RequestHandler = async (req, res, next) => {
   try {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      res.status(409).json({ message: "آیدی وارد شده معتبر نمی باشد." });
+      return;
+    }
+
+    const remove = await product.findByIdAndDelete(id);
+
+    if (!remove) {
+      res.status(404).json({ message: "هیچ محصولی یافت نشد." });
+      return;
+    }
+
+    res.status(200).json({ message: "محصول مورد نظر با موفقیت حذف شد." });
+    return;
   } catch (error) {
     next(error);
   }
