@@ -29,7 +29,7 @@ const schema = new mongoose_1.default.Schema({
     },
     images: {
         type: [String],
-        required: false, //TODO : Change to true
+        required: true,
     },
     isAvailable: {
         type: Boolean,
