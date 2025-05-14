@@ -99,6 +99,18 @@ const update = async (req, res, next) => {
 exports.update = update;
 const remove = async (req, res, next) => {
     try {
+        const { id } = req.params;
+        if (!mongoose_1.default.isValidObjectId(id)) {
+            res.status(409).json({ message: "آیدی وارد شده معتبر نمی باشد." });
+            return;
+        }
+        const remove = await BaseProduct_1.product.findByIdAndDelete(id);
+        if (!remove) {
+            res.status(404).json({ message: "هیچ محصولی یافت نشد." });
+            return;
+        }
+        res.status(200).json({ message: "محصول مورد نظر با موفقیت حذف شد." });
+        return;
     }
     catch (error) {
         next(error);
