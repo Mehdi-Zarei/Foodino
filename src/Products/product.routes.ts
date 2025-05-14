@@ -1,4 +1,6 @@
 import { Router } from "express";
+const router = Router();
+
 import {
   createOne,
   getAll,
@@ -7,9 +9,12 @@ import {
   update,
 } from "./product.controller";
 
-const router = Router();
+//* Uploader
+import { multerStorage } from "../utils/multer";
+const upload = multerStorage("public/images", 15, [".jpg", ".jpeg"]);
 
-router.route("/").post(createOne).get(getAll);
+//* Routes
+router.route("/").post(upload.array("images", 10), createOne).get(getAll);
 
 router.route("/:id").get(getOne).patch(update).delete(remove);
 
