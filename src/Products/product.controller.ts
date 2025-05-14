@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, RequestHandler } from "express";
+import { RequestHandler } from "express";
 import { product } from "../models/BaseProduct";
 import foodModel from "../models/FoodProducts";
 import drinkModel from "../models/DrinkProduct";
