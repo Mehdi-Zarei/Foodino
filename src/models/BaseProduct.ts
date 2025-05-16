@@ -8,6 +8,7 @@ interface IBaseProduct {
   images: string[];
   isAvailable: boolean;
   ingredients: string[];
+  __t?: string;
 }
 
 const schema = new mongoose.Schema<IBaseProduct>(
