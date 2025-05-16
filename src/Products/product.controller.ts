@@ -135,7 +135,10 @@ export const update: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    if (req.files) {
+    if (req.files?.length) {
+      mainProduct.images = (req.files as Express.Multer.File[])?.map(
+        (img) => `public/images/${img.filename}`
+      );
     }
 
     if (name) mainProduct.name = name;
