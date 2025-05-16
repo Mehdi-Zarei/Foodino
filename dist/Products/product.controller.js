@@ -105,7 +105,8 @@ const update = async (req, res, next) => {
             res.status(404).json({ message: "محصولی برای آپدیت یافت نشد." });
             return;
         }
-        if (req.files) {
+        if (req.files?.length) {
+            mainProduct.images = req.files?.map((img) => `public/images/${img.filename}`);
         }
         if (name)
             mainProduct.name = name;
