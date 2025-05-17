@@ -51,6 +51,6 @@ const schema = new mongoose.Schema<IBaseProduct>(
   { timestamps: true }
 );
 
-const product = mongoose.model<IBaseProduct>("Products", schema);
+const product = mongoose.model<IBaseProduct>("Product", schema);
 
 export { product, IBaseProduct };

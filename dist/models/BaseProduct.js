@@ -41,5 +41,5 @@ const schema = new mongoose_1.default.Schema({
         required: true,
     },
 }, { timestamps: true });
-const product = mongoose_1.default.model("Products", schema);
+const product = mongoose_1.default.model("Product", schema);
 exports.product = product;
