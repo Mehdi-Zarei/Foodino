@@ -8,10 +8,12 @@ app.use("/public", express.static(path.join(__dirname, "..", "public")));
 //* Files Routes
 import productRouter from "./Products/product.routes";
 import authRouter from "./Auth/auth.routes";
+import userRouter from "./User/user.routes";
 
 //* Routes
 app.use("/product", productRouter);
 app.use("/auth", authRouter);
+app.use("/user", userRouter);
 
 //* 404 Error Handler
 app.use((req: Request, res: Response) => {
