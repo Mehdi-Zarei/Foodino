@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logout = exports.login = exports.register = exports.verifyOtp = exports.sentOtp = void 0;
-const User_1 = __importDefault(require("../models/User"));
+const User_1 = require("../models/User");
 const redis_1 = require("../utils/redis");
 const sentSms_1 = __importDefault(require("../Service/sentSms"));
 const jwt_1 = require("../utils/jwt");
@@ -12,7 +12,7 @@ const bcryptjs_1 = require("../utils/bcryptjs");
 const sentOtp = async (req, res, next) => {
     try {
         const { phone } = req.body;
-        const isUserRestrict = await User_1.default.findOne({ phone, isRestrict: true });
+        const isUserRestrict = await User_1.userModel.findOne({ phone, isRestrict: true });
         if (isUserRestrict) {
             res
                 .status(403)
@@ -58,12 +58,12 @@ const verifyOtp = async (req, res, next) => {
             });
             return;
         }
-        const isUserExist = await User_1.default.findOne({ phone });
+        const isUserExist = await User_1.userModel.findOne({ phone });
         if (isUserExist) {
             const accessToken = await (0, jwt_1.generateAccessToken)(isUserExist._id, isUserExist.role);
             const refreshToken = await (0, jwt_1.generateRefreshToken)(isUserExist._id);
             const hashRefreshToken = await (0, bcryptjs_1.hashData)(refreshToken);
-            await (0, redis_1.saveData)(`refreshToken:${isUserExist._id}`, hashRefreshToken, parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN_DAYS));
+            await (0, redis_1.saveData)(`refreshToken:${isUserExist._id}`, hashRefreshToken, parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN_SECOND));
             res.status(200).json({
                 message: "با موفقیت وارد حساب کاربری خود شدید",
                 data: { accessToken, refreshToken },
@@ -81,6 +81,37 @@ const verifyOtp = async (req, res, next) => {
 exports.verifyOtp = verifyOtp;
 const register = async (req, res, next) => {
     try {
+        const { name, email, phone, password, addresses, favorites } = req.body;
+        const isUserExist = await User_1.userModel.findOne({ phone });
+        if (isUserExist) {
+            res.status(409).json({ message: "شماره موبایل تکراری می باشد." });
+            return;
+        }
+        const isFirstUser = !!User_1.userModel.countDocuments();
+        const newUser = new User_1.userModel({
+            name,
+            email,
+            phone,
+            addresses,
+            favorites,
+            isRestrict: false,
+            role: isFirstUser ? "ADMIN" : "USER",
+        });
+        if (password) {
+            const hashedPassword = await (0, bcryptjs_1.hashData)(password);
+            newUser.password = hashedPassword;
+        }
+        await newUser.save();
+        const accessToken = await (0, jwt_1.generateAccessToken)(newUser._id, newUser.role);
+        const refreshToken = await (0, jwt_1.generateRefreshToken)(newUser._id);
+        const hashRefreshToken = await (0, bcryptjs_1.hashData)(refreshToken);
+        await (0, redis_1.saveData)(`refreshToken:${newUser._id}`, hashRefreshToken, parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN_SECOND));
+        res.status(201).json({
+            message: "حساب کاربری با موفقیت ایجاد گردید.",
+            refreshToken,
+            accessToken,
+        });
+        return;
     }
     catch (error) {
         next(error);
@@ -89,6 +120,37 @@ const register = async (req, res, next) => {
 exports.register = register;
 const login = async (req, res, next) => {
     try {
+        const { identifier, password } = req.body;
+        const isUserExist = await User_1.userModel.findOne({
+            $or: [{ phone: identifier }, { email: identifier }],
+        });
+        if (!isUserExist) {
+            res.status(404).json({ message: "اطلاعات وارد شده صحیح نمی باشد." });
+            return;
+        }
+        if (!isUserExist.password) {
+            res.status(404).json({
+                message: "برای ورود ابتدا باید رمز عبور تنظیم کنید. لطفاً از طریق کد یکبارمصرف وارد حساب کاربری خود شویدو از طریق پروفایل خود یک رمز عبور تعیین کنید.",
+            });
+            return;
+        }
+        const comparePassword = await (0, bcryptjs_1.compareData)(password, isUserExist.password);
+        if (!comparePassword) {
+            res
+                .status(403)
+                .json({ message: "نام کاربری یا رمز عبور اشتباه می باشد." });
+            return;
+        }
+        const accessToken = await (0, jwt_1.generateAccessToken)(isUserExist._id, isUserExist.role);
+        const refreshToken = await (0, jwt_1.generateRefreshToken)(isUserExist.id);
+        const hashRefreshToken = await (0, bcryptjs_1.hashData)(refreshToken);
+        await (0, redis_1.saveData)(`refreshToken:${isUserExist._id}`, hashRefreshToken, parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN_SECOND));
+        res.status(200).json({
+            message: "با موفقیت وارد حساب کاربری خود شدید.",
+            accessToken,
+            refreshToken,
+        });
+        return;
     }
     catch (error) {
         next(error);
@@ -97,6 +159,11 @@ const login = async (req, res, next) => {
 exports.login = login;
 const logout = async (req, res, next) => {
     try {
+        const user = req.user;
+        await (0, redis_1.removeData)(`refreshToken:${user._id}`);
+        res
+            .status(200)
+            .json({ message: "شما با موفقیت از حساب کاربری خود خارج شدید." });
     }
     catch (error) {
         next(error);
