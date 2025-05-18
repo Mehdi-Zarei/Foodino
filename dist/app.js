@@ -13,12 +13,17 @@ app.use("/public", express_1.default.static(path_1.default.join(__dirname, "..",
 const product_routes_1 = __importDefault(require("./Products/product.routes"));
 const auth_routes_1 = __importDefault(require("./Auth/auth.routes"));
 const user_routes_1 = __importDefault(require("./User/user.routes"));
+const cart_routes_1 = __importDefault(require("./Cart/cart.routes"));
+const Error_Handler_1 = require("./Middlewares/Error Handler");
 //* Routes
 app.use("/product", product_routes_1.default);
 app.use("/auth", auth_routes_1.default);
+app.use("/user/cart", cart_routes_1.default);
 app.use("/user", user_routes_1.default);
 //* 404 Error Handler
 app.use((req, res) => {
     res.status(404).json({ message: "Oops!Page Not Found :(( " });
 });
+//* Global Error Handler
+app.use(Error_Handler_1.errorHandler);
 exports.default = app;
