@@ -5,7 +5,7 @@ const router = express.Router();
 import { login, logout, register, sentOtp, verifyOtp } from "./auth.controller";
 
 //* Middleware
-import authGuard from "../middlewares/auth";
+import authGuard from "../Middlewares/auth";
 
 //* Controller
 

@@ -8,7 +8,7 @@ const router = express_1.default.Router();
 //* Controller
 const auth_controller_1 = require("./auth.controller");
 //* Middleware
-const auth_1 = __importDefault(require("../middlewares/auth"));
+const auth_1 = __importDefault(require("../Middlewares/auth"));
 //* Controller
 //* Routes
 router.route("/sent").post(auth_controller_1.sentOtp);
