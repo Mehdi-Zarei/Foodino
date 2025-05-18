@@ -1,4 +1,4 @@
-import { redisClient as Redis } from "../configs/redis";
+import { redisClient as Redis } from "../Configs/redis";
 
 export const getOtpInfo = async (phone: string) => {
   try {

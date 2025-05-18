@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeData = exports.getData = exports.saveData = exports.getOtpInfo = void 0;
-const redis_1 = require("../configs/redis");
+const redis_1 = require("../Configs/redis");
 const getOtpInfo = async (phone) => {
     try {
         const remainingTime = await redis_1.redisClient.ttl(`otp:${phone}`); // Time in seconds
