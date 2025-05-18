@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const app_1 = __importDefault(require("./app"));
-const db_1 = __importDefault(require("./configs/db"));
-const redis_1 = require("./configs/redis");
+const db_1 = __importDefault(require("./Configs/db"));
+const redis_1 = require("./Configs/redis");
 const startServer = async (app, port) => {
     try {
         (0, db_1.default)();

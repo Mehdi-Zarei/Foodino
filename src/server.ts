@@ -3,8 +3,8 @@ dotenv.config();
 
 import app from "./app";
 import { Express } from "express";
-import connectToDatabase from "./configs/db";
-import { connectRedis } from "./configs/redis";
+import connectToDatabase from "./Configs/db";
+import { connectRedis } from "./Configs/redis";
 
 const startServer = async (app: Express, port: number) => {
   try {
