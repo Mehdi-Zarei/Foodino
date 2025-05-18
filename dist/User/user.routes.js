@@ -8,7 +8,7 @@ const router = express_1.default.Router();
 //* Controller
 const user_controller_1 = require("./user.controller");
 //* Middleware
-const auth_1 = __importDefault(require("../middlewares/auth"));
+const auth_1 = __importDefault(require("../Middlewares/auth"));
 router.route("/update").patch((0, auth_1.default)(), user_controller_1.update);
 router.route("/").get((0, auth_1.default)(["ADMIN"]), user_controller_1.getAll);
 router

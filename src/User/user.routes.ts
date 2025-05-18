@@ -5,7 +5,7 @@ const router = express.Router();
 import { getAll, getOne, me, toggleRestrict, update } from "./user.controller";
 
 //* Middleware
-import authGuard from "../middlewares/auth";
+import authGuard from "../Middlewares/auth";
 
 router.route("/update").patch(authGuard(), update);
 
