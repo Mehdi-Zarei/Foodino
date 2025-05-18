@@ -41,12 +41,11 @@ const cartSchema = new mongoose.Schema<ICart>(
     items: [cartItemsSchema],
     totalCartPrice: {
       type: Number,
-      required: true,
+      required: false,
     },
   },
   { timestamps: true }
 );
-const model = mongoose.model<ICart>("Cart", cartSchema);
 
 cartSchema.pre("save", function (next) {
   this.totalCartPrice = this.items.reduce((total, item) => {
@@ -55,4 +54,6 @@ cartSchema.pre("save", function (next) {
   next();
 });
 
-export { model as cartModel };
+const model = mongoose.model<ICart>("Cart", cartSchema);
+
+export { model as cartModel, ICart };

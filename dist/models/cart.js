@@ -29,14 +29,14 @@ const cartSchema = new mongoose_1.default.Schema({
     items: [cartItemsSchema],
     totalCartPrice: {
         type: Number,
-        required: true,
+        required: false,
     },
 }, { timestamps: true });
-const model = mongoose_1.default.model("Cart", cartSchema);
-exports.cartModel = model;
 cartSchema.pre("save", function (next) {
     this.totalCartPrice = this.items.reduce((total, item) => {
         return total + item.priceAtTimeOfPurchase * item.quantity;
     }, 0);
     next();
 });
+const model = mongoose_1.default.model("Cart", cartSchema);
+exports.cartModel = model;
