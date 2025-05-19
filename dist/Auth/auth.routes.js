@@ -16,4 +16,5 @@ router.route("/verify").post(auth_controller_1.verifyOtp);
 router.route("/register").post(auth_controller_1.register);
 router.route("/login").post(auth_controller_1.login);
 router.route("/logout").post((0, auth_1.default)(), auth_controller_1.logout);
+router.route("/refresh").get(auth_controller_1.refreshToken);
 exports.default = router;

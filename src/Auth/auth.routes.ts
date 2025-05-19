@@ -2,7 +2,14 @@ import express from "express";
 const router = express.Router();
 
 //* Controller
-import { login, logout, register, sentOtp, verifyOtp } from "./auth.controller";
+import {
+  login,
+  logout,
+  register,
+  sentOtp,
+  verifyOtp,
+  refreshToken,
+} from "./auth.controller";
 
 //* Middleware
 import authGuard from "../Middlewares/auth";
@@ -15,5 +22,6 @@ router.route("/verify").post(verifyOtp);
 router.route("/register").post(register);
 router.route("/login").post(login);
 router.route("/logout").post(authGuard(), logout);
+router.route("/refresh").get(refreshToken);
 
 export default router;
