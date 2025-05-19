@@ -1,6 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { IUser, userModel } from "../models/User";
 import { verifyToken } from "../utils/jwt";
+import { Types } from "mongoose";
 
 interface JwtPayload {
   id: string;
@@ -9,8 +10,10 @@ interface JwtPayload {
   exp: number;
 }
 
-interface CustomRequest extends Request {
-  user?: IUser;
+interface ICustomRequest {
+  user?: {
+    _id: Types.ObjectId;
+  };
 }
 
 type Role = "ADMIN" | "USER";
@@ -31,7 +34,10 @@ export const authGuard = (requiredRoles: Role[] = []): RequestHandler => {
         return;
       }
 
-      const decoded = (await verifyToken(token)) as JwtPayload;
+      const decoded = verifyToken(
+        token,
+        process.env.JWT_SECRET_ACCESS_TOKEN!
+      ) as JwtPayload;
 
       const user = await userModel.findById(decoded.id).select("-password");
 
@@ -40,7 +46,7 @@ export const authGuard = (requiredRoles: Role[] = []): RequestHandler => {
         return;
       }
 
-      (req as CustomRequest).user = user;
+      (req as ICustomRequest).user = user;
 
       if (requiredRoles.length === 0) {
         return next();

@@ -13,7 +13,7 @@ const authGuard = (requiredRoles = []) => {
                 });
                 return;
             }
-            const decoded = (await (0, jwt_1.verifyToken)(token));
+            const decoded = (0, jwt_1.verifyToken)(token, process.env.JWT_SECRET_ACCESS_TOKEN);
             const user = await User_1.userModel.findById(decoded.id).select("-password");
             if (!user) {
                 res.status(404).json({ message: "کاربر یافت نشد!" });
