@@ -34,9 +34,6 @@ const orderSchema = new mongoose_1.default.Schema({
     },
     items: [orderItemSchema],
     shippingAddress: [shippingAddressSchema],
-    postTrackingCode: {
-        type: Number,
-    },
     status: {
         type: String,
         enum: ["PROCESSING", "SHIPPED", "DELIVERED"],

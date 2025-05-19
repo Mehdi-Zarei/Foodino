@@ -15,7 +15,6 @@ interface IOrder {
   user: Types.ObjectId;
   items: IOrderItem[];
   shippingAddress: IShippingAddress[];
-  postTrackingCode: number;
   status: string;
   authority: string;
   totalCartPrice: number;
@@ -62,10 +61,6 @@ const orderSchema = new mongoose.Schema<IOrder>(
     items: [orderItemSchema],
 
     shippingAddress: [shippingAddressSchema],
-
-    postTrackingCode: {
-      type: Number,
-    },
 
     status: {
       type: String,
