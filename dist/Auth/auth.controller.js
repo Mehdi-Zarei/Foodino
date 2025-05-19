@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logout = exports.login = exports.register = exports.verifyOtp = exports.sentOtp = void 0;
+exports.refreshToken = exports.logout = exports.login = exports.register = exports.verifyOtp = exports.sentOtp = void 0;
 const User_1 = require("../models/User");
 const redis_1 = require("../utils/redis");
 const sentSms_1 = __importDefault(require("../Service/sentSms"));
@@ -60,8 +60,8 @@ const verifyOtp = async (req, res, next) => {
         }
         const isUserExist = await User_1.userModel.findOne({ phone });
         if (isUserExist) {
-            const accessToken = await (0, jwt_1.generateAccessToken)(isUserExist._id, isUserExist.role);
-            const refreshToken = await (0, jwt_1.generateRefreshToken)(isUserExist._id);
+            const accessToken = (0, jwt_1.generateAccessToken)(isUserExist._id, isUserExist.role);
+            const refreshToken = (0, jwt_1.generateRefreshToken)(isUserExist._id, isUserExist.role);
             const hashRefreshToken = await (0, bcryptjs_1.hashData)(refreshToken);
             await (0, redis_1.saveData)(`refreshToken:${isUserExist._id}`, hashRefreshToken, parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN_SECOND));
             res.status(200).json({
@@ -102,8 +102,8 @@ const register = async (req, res, next) => {
             newUser.password = hashedPassword;
         }
         await newUser.save();
-        const accessToken = await (0, jwt_1.generateAccessToken)(newUser._id, newUser.role);
-        const refreshToken = await (0, jwt_1.generateRefreshToken)(newUser._id);
+        const accessToken = (0, jwt_1.generateAccessToken)(newUser._id, newUser.role);
+        const refreshToken = (0, jwt_1.generateRefreshToken)(newUser._id, newUser.role);
         const hashRefreshToken = await (0, bcryptjs_1.hashData)(refreshToken);
         await (0, redis_1.saveData)(`refreshToken:${newUser._id}`, hashRefreshToken, parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN_SECOND));
         res.status(201).json({
@@ -141,8 +141,8 @@ const login = async (req, res, next) => {
                 .json({ message: "نام کاربری یا رمز عبور اشتباه می باشد." });
             return;
         }
-        const accessToken = await (0, jwt_1.generateAccessToken)(isUserExist._id, isUserExist.role);
-        const refreshToken = await (0, jwt_1.generateRefreshToken)(isUserExist.id);
+        const accessToken = (0, jwt_1.generateAccessToken)(isUserExist._id, isUserExist.role);
+        const refreshToken = (0, jwt_1.generateRefreshToken)(isUserExist.id, isUserExist.role);
         const hashRefreshToken = await (0, bcryptjs_1.hashData)(refreshToken);
         await (0, redis_1.saveData)(`refreshToken:${isUserExist._id}`, hashRefreshToken, parseInt(process.env.REFRESH_TOKEN_EXPIRES_IN_SECOND));
         res.status(200).json({
@@ -159,8 +159,8 @@ const login = async (req, res, next) => {
 exports.login = login;
 const logout = async (req, res, next) => {
     try {
-        const user = req.user;
-        await (0, redis_1.removeData)(`refreshToken:${user._id}`);
+        const userID = req.user?._id;
+        await (0, redis_1.removeData)(`refreshToken:${userID}`);
         res
             .status(200)
             .json({ message: "شما با موفقیت از حساب کاربری خود خارج شدید." });
@@ -170,3 +170,20 @@ const logout = async (req, res, next) => {
     }
 };
 exports.logout = logout;
+const refreshToken = async (req, res, next) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
+        if (!refreshToken) {
+            res.status(403).json({ msg: "لطفاً ابتدا وارد حساب کاربری خود شوید." });
+            return;
+        }
+        const decode = (0, jwt_1.verifyToken)(refreshToken, process.env.JWT_SECRET_REFRESH_TOKEN);
+        const accessToken = (0, jwt_1.generateAccessToken)(decode.id, decode.role);
+        res.status(200).json({ accessToken });
+        return;
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.refreshToken = refreshToken;

@@ -1,12 +1,20 @@
-import { RequestHandler, Request } from "express";
+import { RequestHandler } from "express";
 import { userModel, IUser } from "../models/User";
 import { getData, getOtpInfo, removeData, saveData } from "../utils/redis";
 import sentSms from "../Service/sentSms";
-import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyToken,
+} from "../utils/jwt";
 import { compareData, hashData } from "../utils/bcryptjs";
+import { Types } from "mongoose";
+import { JwtPayload } from "jsonwebtoken";
 
-interface CustomRequest extends Request {
-  user?: IUser;
+interface ICustomRequest {
+  user?: {
+    _id: Types.ObjectId;
+  };
 }
 
 export const sentOtp: RequestHandler = async (req, res, next) => {
@@ -77,12 +85,15 @@ export const verifyOtp: RequestHandler = async (req, res, next) => {
     const isUserExist = await userModel.findOne({ phone });
 
     if (isUserExist) {
-      const accessToken = await generateAccessToken(
+      const accessToken = generateAccessToken(
         isUserExist._id,
         isUserExist.role
       );
 
-      const refreshToken = await generateRefreshToken(isUserExist._id);
+      const refreshToken = generateRefreshToken(
+        isUserExist._id,
+        isUserExist.role
+      );
 
       const hashRefreshToken = await hashData(refreshToken);
 
@@ -136,8 +147,8 @@ export const register: RequestHandler = async (req, res, next) => {
 
     await newUser.save();
 
-    const accessToken = await generateAccessToken(newUser._id, newUser.role);
-    const refreshToken = await generateRefreshToken(newUser._id);
+    const accessToken = generateAccessToken(newUser._id, newUser.role);
+    const refreshToken = generateRefreshToken(newUser._id, newUser.role);
     const hashRefreshToken = await hashData(refreshToken);
     await saveData(
       `refreshToken:${newUser._id}`,
@@ -176,7 +187,6 @@ export const login: RequestHandler = async (req, res, next) => {
       });
       return;
     }
-
     const comparePassword = await compareData(password, isUserExist.password);
 
     if (!comparePassword) {
@@ -186,12 +196,11 @@ export const login: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const accessToken = await generateAccessToken(
-      isUserExist._id,
-      isUserExist.role
-    );
-    const refreshToken = await generateRefreshToken(isUserExist.id);
+    const accessToken = generateAccessToken(isUserExist._id, isUserExist.role);
+    const refreshToken = generateRefreshToken(isUserExist.id, isUserExist.role);
+
     const hashRefreshToken = await hashData(refreshToken);
+
     await saveData(
       `refreshToken:${isUserExist._id}`,
       hashRefreshToken,
@@ -203,6 +212,7 @@ export const login: RequestHandler = async (req, res, next) => {
       accessToken,
       refreshToken,
     });
+
     return;
   } catch (error) {
     next(error);
@@ -211,13 +221,36 @@ export const login: RequestHandler = async (req, res, next) => {
 
 export const logout: RequestHandler = async (req, res, next) => {
   try {
-    const user = (req as CustomRequest).user;
+    const userID = (req as ICustomRequest).user?._id;
 
-    await removeData(`refreshToken:${(user as any)._id}`);
+    await removeData(`refreshToken:${userID}`);
 
     res
       .status(200)
       .json({ message: "شما با موفقیت از حساب کاربری خود خارج شدید." });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const refreshToken: RequestHandler = async (req, res, next) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      res.status(403).json({ msg: "لطفاً ابتدا وارد حساب کاربری خود شوید." });
+      return;
+    }
+
+    const decode = verifyToken(
+      refreshToken,
+      process.env.JWT_SECRET_REFRESH_TOKEN!
+    ) as JwtPayload;
+
+    const accessToken = generateAccessToken(decode.id, decode.role);
+
+    res.status(200).json({ accessToken });
+    return;
   } catch (error) {
     next(error);
   }
