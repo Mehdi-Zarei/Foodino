@@ -1,17 +1,18 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.errorHandler = void 0;
+const zod_1 = require("zod");
 const errorHandler = (err, req, res, next) => {
     console.log("🧯 Error Handler Triggered");
     const status = err.status || 500;
     const defaultMessage = "خطای داخلی سرور";
-    // Joi validation error
-    if (err.isJoi) {
-        const validationErrors = err.details.map((detail) => ({
-            field: detail.context?.key || "نامشخص",
+    // Zod validation error
+    if (err instanceof zod_1.ZodError) {
+        const validationErrors = err.errors.map((detail) => ({
+            field: detail.path.join(".") || "نامشخص",
             message: detail.message,
         }));
-        console.log("📦 Joi Validation Error:", validationErrors);
+        console.log("📦 Zod Validation Error:", validationErrors);
         res
             .status(409)
             .json({ msg: "خطا در اعتبارسنجی اطلاعات", validationErrors });
