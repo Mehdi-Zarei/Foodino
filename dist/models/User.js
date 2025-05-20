@@ -46,10 +46,12 @@ const schema = new mongoose_1.default.Schema({
         required: true,
         default: "USER",
     },
-    favorites: {
-        type: [String],
-        required: false,
-    },
+    favorites: [
+        {
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: "Product",
+        },
+    ],
 }, { timestamps: true });
 schema.index({ email: 1, phone: 1 });
 const userModel = mongoose_1.default.model("User", schema);
