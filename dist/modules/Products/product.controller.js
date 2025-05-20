@@ -5,12 +5,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.remove = exports.update = exports.getOne = exports.getAll = exports.createOne = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
-const BaseProduct_1 = require("../models/BaseProduct");
-const FoodProducts_1 = __importDefault(require("../models/FoodProducts"));
-const DrinkProduct_1 = __importDefault(require("../models/DrinkProduct"));
+const BaseProduct_1 = require("../../models/BaseProduct");
+const FoodProducts_1 = __importDefault(require("../../models/FoodProducts"));
+const DrinkProduct_1 = __importDefault(require("../../models/DrinkProduct"));
+const product_validator_1 = require("./product.validator");
 const createOne = async (req, res, next) => {
     try {
         const { name, price, type, description, isAvailable, ingredients, calories, weight, volume, caffeineLevel, } = req.body;
+        const parsedBody = {
+            ...req.body,
+            price: Number(req.body.price),
+            isAvailable: Boolean(req.body.isAvailable),
+            calories: Number(req.body.calories),
+            weight: Number(req.body.weight),
+            volume: Number(req.body.volume),
+            caffeineLevel: Number(req.body.caffeineLevel),
+            images: req.files?.map((img) => `public/images/${img.filename}`),
+        };
+        console.log(parsedBody);
+        product_validator_1.productSchema.parse(parsedBody);
         const existProduct = await BaseProduct_1.product.findOne({ name, price, type }).lean();
         if (existProduct) {
             res.status(409).json({ message: "این محصول از قبل وجود دارد." });
@@ -96,6 +109,7 @@ const update = async (req, res, next) => {
     try {
         const { id } = req.params;
         const { name, price, type, description, isAvailable, ingredients, calories, weight, volume, caffeineLevel, } = req.body;
+        product_validator_1.updateProductSchema.parse(req.body);
         if (!mongoose_1.default.isValidObjectId(id)) {
             res.status(409).json({ message: "آیدی وارد شده صحیح نمی باشد." });
             return;

@@ -10,7 +10,7 @@ import {
 } from "./product.controller";
 
 //* Uploader
-import { multerStorage } from "../utils/multer";
+import { multerStorage } from "../../utils/multer";
 const upload = multerStorage("public/images", 15, [".jpg", ".jpeg"]);
 
 //* Routes

@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
 //* Middleware
-const auth_1 = __importDefault(require("../Middlewares/auth"));
+const auth_1 = __importDefault(require("../../Middlewares/auth"));
 //* Controller
 const checkout_controller_1 = require("./checkout.controller");
 //* Routes

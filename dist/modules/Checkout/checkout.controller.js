@@ -25,12 +25,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyCheckout = exports.createCheckout = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const User_1 = require("../models/User");
-const Cart_1 = require("../models/Cart");
-const BaseProduct_1 = require("../models/BaseProduct");
-const Checkout_1 = require("../models/Checkout");
-const zarinpal_1 = require("../Service/zarinpal");
-const Order_1 = require("../models/Order");
+const User_1 = require("../../models/User");
+const Cart_1 = require("../../models/Cart");
+const BaseProduct_1 = require("../../models/BaseProduct");
+const Checkout_1 = require("../../models/Checkout");
+const zarinpal_1 = require("../../Service/zarinpal");
+const Order_1 = require("../../models/Order");
+const checkout_validator_1 = require("./checkout.validator");
 const createCheckout = async (req, res, next) => {
     try {
         const { shippingAddressID } = req.body;
@@ -105,6 +106,7 @@ const verifyCheckout = async (req, res, next) => {
     session.startTransaction();
     try {
         const { Status, Authority } = req.query;
+        checkout_validator_1.checkoutQuerySchema.parse(req.query);
         const hasOrderAlreadyCreated = await Order_1.orderModel
             .findOne({
             authority: Authority,

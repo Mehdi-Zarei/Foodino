@@ -63,10 +63,12 @@ const schema = new mongoose.Schema<IUser>(
       required: true,
       default: "USER",
     },
-    favorites: {
-      type: [String],
-      required: false,
-    },
+    favorites: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
   },
   { timestamps: true }
 );

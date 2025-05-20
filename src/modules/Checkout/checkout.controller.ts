@@ -1,11 +1,12 @@
 import { RequestHandler } from "express";
 import mongoose, { isValidObjectId, Types } from "mongoose";
-import { userModel } from "../models/User";
-import { cartModel } from "../models/Cart";
-import { product } from "../models/BaseProduct";
-import { checkoutModel } from "../models/Checkout";
-import { createPayment, verifyPayment } from "../Service/zarinpal";
-import { orderModel } from "../models/Order";
+import { userModel } from "../../models/User";
+import { cartModel } from "../../models/Cart";
+import { product } from "../../models/BaseProduct";
+import { checkoutModel } from "../../models/Checkout";
+import { createPayment, verifyPayment } from "../../Service/zarinpal";
+import { orderModel } from "../../models/Order";
+import { checkoutQuerySchema } from "./checkout.validator";
 
 interface ICustomRequest {
   user?: {
@@ -108,6 +109,8 @@ export const verifyCheckout: RequestHandler = async (req, res, next) => {
   session.startTransaction();
   try {
     const { Status, Authority } = req.query;
+
+    checkoutQuerySchema.parse(req.query);
 
     const hasOrderAlreadyCreated = await orderModel
       .findOne({

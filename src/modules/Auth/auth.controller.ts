@@ -1,13 +1,13 @@
 import { RequestHandler } from "express";
-import { userModel, IUser } from "../models/User";
-import { getData, getOtpInfo, removeData, saveData } from "../utils/redis";
-import sentSms from "../Service/sentSms";
+import { userModel, IUser } from "../../models/User";
+import { getData, getOtpInfo, removeData, saveData } from "../../utils/redis";
+import sentSms from "../../Service/sentSms";
 import {
   generateAccessToken,
   generateRefreshToken,
   verifyToken,
-} from "../utils/jwt";
-import { compareData, hashData } from "../utils/bcryptjs";
+} from "../../utils/jwt";
+import { compareData, hashData } from "../../utils/bcryptjs";
 import { Types } from "mongoose";
 import { JwtPayload } from "jsonwebtoken";
 
@@ -54,7 +54,6 @@ export const sentOtp: RequestHandler = async (req, res, next) => {
     if (smsResult.success) {
       res.status(200).json({
         message: "کد یکبار مصرف با موفقیت ارسال گردید.",
-        data: generateOtpCode,
       });
       return;
     } else {
@@ -224,6 +223,12 @@ export const logout: RequestHandler = async (req, res, next) => {
     const userID = (req as ICustomRequest).user?._id;
 
     await removeData(`refreshToken:${userID}`);
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
 
     res
       .status(200)

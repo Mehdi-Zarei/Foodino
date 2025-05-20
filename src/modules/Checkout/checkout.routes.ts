@@ -2,7 +2,7 @@ import express from "express";
 const router = express.Router();
 
 //* Middleware
-import authGuard from "../Middlewares/auth";
+import authGuard from "../../Middlewares/auth";
 
 //* Controller
 import { createCheckout, verifyCheckout } from "./checkout.controller";

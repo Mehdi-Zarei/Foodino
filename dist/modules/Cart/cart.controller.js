@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeFromCart = exports.addToCart = exports.getCart = void 0;
-const Cart_1 = require("../models/Cart");
+const Cart_1 = require("../../models/Cart");
 const mongoose_1 = require("mongoose");
-const BaseProduct_1 = require("../models/BaseProduct");
+const BaseProduct_1 = require("../../models/BaseProduct");
 const getCart = async (req, res, next) => {
     try {
         const userID = req.user._id;
-        let userCart = await Cart_1.cartModel.findOne({ user: userID }); //TODO Populate
+        let userCart = await Cart_1.cartModel.findOne({ user: userID });
         if (!userCart) {
             res.status(404).json({ msg: "سبد خرید شما خالی است.", userCart: [] });
             return;

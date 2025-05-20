@@ -1,10 +1,11 @@
 import { RequestHandler } from "express";
-import { IUser, userModel } from "../models/User";
-import { isValidObjectId } from "mongoose";
-import { hashData } from "../utils/bcryptjs";
+import { IUser, userModel } from "../../models/User";
+import { isValidObjectId, Types } from "mongoose";
+import { hashData } from "../../utils/bcryptjs";
+import { product } from "../../models/BaseProduct";
 
 interface ICustomRequest {
-  user?: IUser;
+  user?: IUser & { _id: Types.ObjectId };
 }
 
 export const getAll: RequestHandler = async (req, res, next) => {
@@ -122,6 +123,24 @@ export const update: RequestHandler = async (req, res, next) => {
 export const getFavorite: RequestHandler = async (req, res, next) => {
   try {
     const user = (req as ICustomRequest).user;
+
+    const userFavorite = await userModel
+      .findOne({ _id: user?._id })
+      .select("favorites");
+
+    if (!userFavorite?.favorites?.length) {
+      res.status(404).json({
+        msg: "شما تاکنون محصولی را به لیست مورد علاقه ها اضافه نکرده اید.",
+      });
+      return;
+    }
+
+    const favoriteProducts = await product.find({
+      _id: userFavorite.favorites,
+    });
+
+    res.status(200).json(favoriteProducts);
+    return;
   } catch (error) {
     next(error);
   }
@@ -129,6 +148,40 @@ export const getFavorite: RequestHandler = async (req, res, next) => {
 
 export const addFavorite: RequestHandler = async (req, res, next) => {
   try {
+    const { productID } = req.body;
+    const user = (req as ICustomRequest).user;
+
+    if (!isValidObjectId(productID)) {
+      res.status(409).json({ message: "آیدی وارد شده صحیح نمی باشد." });
+      return;
+    }
+
+    const isDuplicateFavorite = await userModel.findOne({
+      _id: user?._id,
+      favorites: productID,
+    });
+
+    if (isDuplicateFavorite) {
+      res.status(409).json({
+        msg: "شما این محصول را قبلا در لیست علاقه مندی های خود قرار داده اید.",
+      });
+      return;
+    }
+
+    const add = await userModel.findOneAndUpdate(
+      { _id: user?._id },
+      { $push: { favorites: productID } }
+    );
+
+    if (!add) {
+      res.status(409).json({ msg: "محصول یافت نشد." });
+      return;
+    }
+
+    res.status(200).json({
+      msg: "محصول مورد نظر با موفقیت به لیست علاقه مندی ها افزوده شد..",
+    });
+    return;
   } catch (error) {
     next(error);
   }

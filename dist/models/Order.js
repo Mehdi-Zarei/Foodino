@@ -36,6 +36,7 @@ const orderSchema = new mongoose_1.default.Schema({
     shippingAddress: [shippingAddressSchema],
     status: {
         type: String,
+        required: true,
         enum: ["PROCESSING", "SHIPPED", "DELIVERED"],
         default: "PROCESSING",
     },

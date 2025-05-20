@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
 import mongoose from "mongoose";
-import { product } from "../models/BaseProduct";
-import foodModel from "../models/FoodProducts";
-import drinkModel from "../models/DrinkProduct";
+import { product } from "../../models/BaseProduct";
+import foodModel from "../../models/FoodProducts";
+import drinkModel from "../../models/DrinkProduct";
+import { productSchema, updateProductSchema } from "./product.validator";
 
 export const createOne: RequestHandler = async (req, res, next) => {
   try {
@@ -18,6 +19,23 @@ export const createOne: RequestHandler = async (req, res, next) => {
       volume,
       caffeineLevel,
     } = req.body;
+
+    const parsedBody = {
+      ...req.body,
+      price: Number(req.body.price),
+      isAvailable: Boolean(req.body.isAvailable),
+      calories: Number(req.body.calories),
+      weight: Number(req.body.weight),
+      volume: Number(req.body.volume),
+      caffeineLevel: Number(req.body.caffeineLevel),
+      images: (req.files as Express.Multer.File[])?.map(
+        (img) => `public/images/${img.filename}`
+      ),
+    };
+
+    console.log(parsedBody);
+
+    productSchema.parse(parsedBody);
 
     const existProduct = await product.findOne({ name, price, type }).lean();
 
@@ -122,6 +140,8 @@ export const update: RequestHandler = async (req, res, next) => {
       volume,
       caffeineLevel,
     } = req.body;
+
+    updateProductSchema.parse(req.body);
 
     if (!mongoose.isValidObjectId(id)) {
       res.status(409).json({ message: "آیدی وارد شده صحیح نمی باشد." });

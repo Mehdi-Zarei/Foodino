@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addFavorite = exports.getFavorite = exports.update = exports.me = exports.toggleRestrict = exports.getOne = exports.getAll = void 0;
-const User_1 = require("../models/User");
+const User_1 = require("../../models/User");
 const mongoose_1 = require("mongoose");
-const bcryptjs_1 = require("../utils/bcryptjs");
+const bcryptjs_1 = require("../../utils/bcryptjs");
+const BaseProduct_1 = require("../../models/BaseProduct");
 const getAll = async (req, res, next) => {
     try {
         const users = await User_1.userModel.find({}).select("-password -__v").lean();
@@ -109,6 +110,20 @@ exports.update = update;
 const getFavorite = async (req, res, next) => {
     try {
         const user = req.user;
+        const userFavorite = await User_1.userModel
+            .findOne({ _id: user?._id })
+            .select("favorites");
+        if (!userFavorite?.favorites?.length) {
+            res.status(404).json({
+                msg: "شما تاکنون محصولی را به لیست مورد علاقه ها اضافه نکرده اید.",
+            });
+            return;
+        }
+        const favoriteProducts = await BaseProduct_1.product.find({
+            _id: userFavorite.favorites,
+        });
+        res.status(200).json(favoriteProducts);
+        return;
     }
     catch (error) {
         next(error);
@@ -117,6 +132,31 @@ const getFavorite = async (req, res, next) => {
 exports.getFavorite = getFavorite;
 const addFavorite = async (req, res, next) => {
     try {
+        const { productID } = req.body;
+        const user = req.user;
+        if (!(0, mongoose_1.isValidObjectId)(productID)) {
+            res.status(409).json({ message: "آیدی وارد شده صحیح نمی باشد." });
+            return;
+        }
+        const isDuplicateFavorite = await User_1.userModel.findOne({
+            _id: user?._id,
+            favorites: productID,
+        });
+        if (isDuplicateFavorite) {
+            res.status(409).json({
+                msg: "شما این محصول را قبلا در لیست علاقه مندی های خود قرار داده اید.",
+            });
+            return;
+        }
+        const add = await User_1.userModel.findOneAndUpdate({ _id: user?._id }, { $push: { favorites: productID } });
+        if (!add) {
+            res.status(409).json({ msg: "محصول یافت نشد." });
+            return;
+        }
+        res.status(200).json({
+            msg: "محصول مورد نظر با موفقیت به لیست علاقه مندی ها افزوده شد..",
+        });
+        return;
     }
     catch (error) {
         next(error);

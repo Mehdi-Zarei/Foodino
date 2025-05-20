@@ -10,11 +10,12 @@ app.use("/public", express.static(path.join(__dirname, "..", "public")));
 app.use(cookieParser());
 
 //* Files Routes
-import productRouter from "./Products/product.routes";
-import authRouter from "./Auth/auth.routes";
-import userRouter from "./User/user.routes";
-import cartRouter from "./Cart/cart.routes";
-import checkoutRouter from "./Checkout/checkout.routes";
+import productRouter from "./modules/Products/product.routes";
+import authRouter from "./modules/Auth/auth.routes";
+import userRouter from "./modules/User/user.routes";
+import cartRouter from "./modules/Cart/cart.routes";
+import checkoutRouter from "./modules/Checkout/checkout.routes";
+import orderRouter from "./modules/Order/order.routes";
 
 //* Routes
 app.use("/api/product", productRouter);
@@ -22,6 +23,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/user/cart", cartRouter);
 app.use("/api/user", userRouter);
 app.use("/api/checkouts", checkoutRouter);
+app.use("/api/orders", orderRouter);
 
 //* 404 Error Handler
 app.use((req: Request, res: Response) => {

@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { ZodError } from "zod";
 
 export const errorHandler = (
   err: any,
@@ -11,14 +12,14 @@ export const errorHandler = (
   const status = err.status || 500;
   const defaultMessage = "خطای داخلی سرور";
 
-  // Joi validation error
-  if (err.isJoi) {
-    const validationErrors = err.details.map((detail: any) => ({
-      field: detail.context?.key || "نامشخص",
+  // Zod validation error
+  if (err instanceof ZodError) {
+    const validationErrors = err.errors.map((detail) => ({
+      field: detail.path.join(".") || "نامشخص",
       message: detail.message,
     }));
 
-    console.log("📦 Joi Validation Error:", validationErrors);
+    console.log("📦 Zod Validation Error:", validationErrors);
 
     res
       .status(409)

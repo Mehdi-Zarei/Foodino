@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
-import { cartModel } from "../models/Cart";
+import { cartModel } from "../../models/Cart";
 import { isValidObjectId, Types } from "mongoose";
-import { product } from "../models/BaseProduct";
+import { product } from "../../models/BaseProduct";
 
 interface ICustomRequest {
   user?: {
@@ -13,7 +13,7 @@ export const getCart: RequestHandler = async (req, res, next) => {
   try {
     const userID = (req as ICustomRequest).user!._id;
 
-    let userCart = await cartModel.findOne({ user: userID }); //TODO Populate
+    let userCart = await cartModel.findOne({ user: userID });
 
     if (!userCart) {
       res.status(404).json({ msg: "سبد خرید شما خالی است.", userCart: [] });

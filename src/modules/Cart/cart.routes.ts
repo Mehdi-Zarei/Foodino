@@ -5,11 +5,15 @@ const router = express.Router();
 import { addToCart, getCart, removeFromCart } from "./cart.controller";
 
 //* Middlewares
-import authGuard from "../Middlewares/auth";
+import authGuard from "../../Middlewares/auth";
+import { validate } from "../../Middlewares/validate";
+import { productQuantitySchema } from "./cart.validator";
 
 //* Routes
 router.route("/").get(authGuard(), getCart);
-router.route("/:productId/add").post(authGuard(), addToCart);
+router
+  .route("/:productId/add")
+  .post(authGuard(), validate(productQuantitySchema), addToCart);
 router.route("/:productId/remove").delete(authGuard(), removeFromCart);
 
 export default router;
