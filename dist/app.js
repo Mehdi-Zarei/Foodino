@@ -13,17 +13,19 @@ app.use(express_1.default.urlencoded({ extended: false }));
 app.use("/public", express_1.default.static(path_1.default.join(__dirname, "..", "public")));
 app.use((0, cookie_parser_1.default)());
 //* Files Routes
-const product_routes_1 = __importDefault(require("./Products/product.routes"));
-const auth_routes_1 = __importDefault(require("./Auth/auth.routes"));
-const user_routes_1 = __importDefault(require("./User/user.routes"));
-const cart_routes_1 = __importDefault(require("./Cart/cart.routes"));
-const checkout_routes_1 = __importDefault(require("./Checkout/checkout.routes"));
+const product_routes_1 = __importDefault(require("./modules/Products/product.routes"));
+const auth_routes_1 = __importDefault(require("./modules/Auth/auth.routes"));
+const user_routes_1 = __importDefault(require("./modules/User/user.routes"));
+const cart_routes_1 = __importDefault(require("./modules/Cart/cart.routes"));
+const checkout_routes_1 = __importDefault(require("./modules/Checkout/checkout.routes"));
+const order_routes_1 = __importDefault(require("./modules/Order/order.routes"));
 //* Routes
 app.use("/api/product", product_routes_1.default);
 app.use("/api/auth", auth_routes_1.default);
 app.use("/api/user/cart", cart_routes_1.default);
 app.use("/api/user", user_routes_1.default);
 app.use("/api/checkouts", checkout_routes_1.default);
+app.use("/api/orders", order_routes_1.default);
 //* 404 Error Handler
 app.use((req, res) => {
     res.status(404).json({ message: "Oops!Page Not Found :(( " });
