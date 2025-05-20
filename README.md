@@ -161,27 +161,33 @@ Also configure `.env` file correctly based on `.env.example`.
 ## 📂 Folder Structure Overview
 
 ```
-src/
-├── auth/
-├── cart/
-├── checkout/
-├── order/
-├── product/
-├── user/
-├── configs/
-├── service/
-├── utils/
-│   ├── bcrypt.ts
-│   ├── jwt.ts
-│   └── redis.ts
-├── models/
-│   └── product.model.ts  // includes base + discriminators
-├── middlewares/
-│   ├── authGuard.ts
-│   └── errorHandler.ts
-├── app.ts
-└── server.ts
-
+project-root/
+├── dist/
+├── public/
+├── src/
+│   ├── modules/
+│   │   ├── auth/
+│   │   ├── cart/
+│   │   ├── checkout/
+│   │   ├── order/
+│   │   ├── product/
+│   │   └── user/
+│   ├── configs/
+│   ├── services/
+│   ├── utils/
+│   │   ├── bcrypt.ts
+│   │   ├── jwt.ts
+│   │   └── redis.ts
+│   ├── middlewares/
+│   │   ├── authGuard.ts
+│   │   └── errorHandler.ts
+│   ├── app.ts
+│   └── server.ts
+├── .env.example
+├── .gitignore
+├── package.json
+├── README.md
+└── tsconfig.json
 ```
 
 ## 🛡️ Security & Best Practices
