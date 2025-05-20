@@ -12,7 +12,7 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "description": "",
+  "description": "Welcome to Foodino, a fully modular and scalable backend project for an online café-restaurant 🥗☕ built with TypeScript and Express.js. This backend serves a full e-commerce system where users can order both food and drinks, authenticate via OTP or password, and pay online using Zarinpal 🧾.",
   "dependencies": {
     "axios": "^1.9.0",
     "cookie-parser": "^1.4.7",
