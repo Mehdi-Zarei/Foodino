@@ -21,7 +21,6 @@ import {
   loginSchema,
 } from "./auth.validator";
 
-//* Controller
 
 //* Routes
 router.route("/sent").post(validate(phoneSchema), sentOtp);
